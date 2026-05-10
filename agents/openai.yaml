@@ -1,0 +1,7 @@
+interface:
+  display_name: "Obsidian Karpathy Wiki"
+  short_description: "One-command Obsidian LLM wiki workflows"
+  default_prompt: "Use $obsidian-karpathy-wiki to ingest this article into my Obsidian wiki and refresh visualization."
+policy:
+  allow_implicit_invocation: true
+

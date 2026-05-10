@@ -1,0 +1,9 @@
+{
+  "name": "obsidian-karpathy-wiki",
+  "version": "0.1.0",
+  "author": "NimaChu",
+  "license": "MIT",
+  "description": "Cross-agent Obsidian Karpathy-style LLM wiki workflows for ingest, query, lint, status, and local web visualization.",
+  "requires": [],
+  "keywords": ["obsidian", "knowledge-base", "llm-wiki", "karpathy", "dashboard", "openclaw", "codex", "claude-code"]
+}

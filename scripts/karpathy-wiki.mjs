@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import os from "node:os";
+import path from "node:path";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const command = process.argv[2] || "help";
+const rest = process.argv.slice(3);
+
+const commands = {
+  status: ["vault-status.mjs"],
+  lint: ["wiki-lint.mjs"],
+  capture: ["quick-capture.mjs", ...rest],
+  refresh: ["refresh-dashboard.mjs", ...rest],
+  dashboard: ["refresh-dashboard.mjs", "--serve", ...rest],
+  build: ["refresh-dashboard.mjs", "--build", ...rest],
+  "build-dashboard": ["refresh-dashboard.mjs", "--serve", "--build", ...rest]
+};
+
+function printHelp() {
+  const defaultVault = path.join(os.homedir(), "Documents", "knowledge");
+  console.log(`Karpathy Obsidian Wiki CLI
+
+Usage:
+  node scripts/karpathy-wiki.mjs status
+  node scripts/karpathy-wiki.mjs lint
+  node scripts/karpathy-wiki.mjs dashboard
+  node scripts/karpathy-wiki.mjs refresh [--serve] [--build]
+  node scripts/karpathy-wiki.mjs build-dashboard
+  node scripts/karpathy-wiki.mjs capture --title "Title" --url "https://..." --type webpage
+
+Environment:
+  KARPATHY_OBSIDIAN_VAULT=/path/to/vault
+  OBSIDIAN_VAULT_PATH=/path/to/vault
+
+Default vault:
+  ${defaultVault}
+`);
+}
+
+if (command === "help" || command === "--help" || command === "-h") {
+  printHelp();
+  process.exit(0);
+}
+
+const args = commands[command];
+if (!args) {
+  console.error(`Unknown command: ${command}`);
+  printHelp();
+  process.exit(2);
+}
+
+const script = path.join(here, args[0]);
+const result = spawnSync("node", [script, ...args.slice(1)], {
+  stdio: "inherit",
+  env: process.env
+});
+
+process.exit(result.status ?? 1);
