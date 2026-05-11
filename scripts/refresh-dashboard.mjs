@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { createWriteStream } from "node:fs";
+import { closeSync, openSync } from "node:fs";
 import { promises as fs } from "node:fs";
 import http from "node:http";
 import path from "node:path";
@@ -44,13 +44,14 @@ if (shouldBuild) run("npm", ["run", "build"]);
 
 if (shouldServe && !(await isServerAlive())) {
   const logPath = path.join(dash, "vite.log");
-  const log = createWriteStream(logPath, { flags: "a" });
+  const logFd = openSync(logPath, "a");
   const child = spawn("npm", ["run", "dev", "--", "--port", String(DASHBOARD_PORT)], {
     cwd: dash,
     detached: true,
-    stdio: ["ignore", log, log]
+    stdio: ["ignore", logFd, logFd]
   });
   child.unref();
+  closeSync(logFd);
 
   for (let i = 0; i < 20; i += 1) {
     await new Promise((resolve) => setTimeout(resolve, 250));
@@ -67,4 +68,3 @@ console.log(JSON.stringify({
   graph: graph.stats,
   server: shouldServe ? await isServerAlive() : "not requested"
 }, null, 2));
-
