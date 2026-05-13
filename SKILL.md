@@ -1,14 +1,14 @@
 ---
 name: obsidian-karpathy-wiki
 description: Use when managing a local Obsidian Karpathy-style LLM wiki: 知识库, Obsidian, 卡帕西方法, 入库, 收录文章, 查询知识库, 维护 wiki, 刷新图谱, 可视化, dashboard, Dataview, raw/wiki notes. Provides one-command workflows for ingest, query, lint, status, and local web visualization. Compatible with Codex, Claude Code, and OpenClaw.
-version: 0.1.0
+version: 0.2.0
 metadata:
   openclaw: {"emoji":"🧠","category":"knowledge"}
 ---
 
 # Obsidian Karpathy Wiki
 
-Use this skill as the agent entry point for a local Obsidian LLM Wiki.
+Use this skill as the agent entry point for a local Obsidian-first LLM Wiki.
 
 Default vault:
 
@@ -18,10 +18,14 @@ Default vault:
 
 ## Fast Router
 
-- **Ingest / 入库 / 收录**: capture source into `raw/`, synthesize durable pages in `wiki/`, update `wiki/log.md`, then refresh visualization automatically.
+- **Ingest / 入库 / 收录**: capture source into `raw/`, preserve a snapshot and inline image order when possible, synthesize durable pages in `wiki/`, update `wiki/log.md`, then refresh visualization automatically.
 - **Query / 问知识库**: read `wiki/index.md` first, then relevant wiki pages, then raw sources only when needed.
 - **Status**: run `node scripts/karpathy-wiki.mjs status`.
-- **Lint / 维护 / 清理**: run `node scripts/karpathy-wiki.mjs lint`; fix broken links, missing metadata, or orphaned wiki pages where safe.
+- **Garden / 维护巡检**: run `node scripts/karpathy-wiki.mjs garden`; review the maintenance queue.
+- **Lint / 清理**: run `node scripts/karpathy-wiki.mjs lint`; fix broken links, missing metadata, or orphaned wiki pages where safe.
+- **Repair links / 断链建议**: run `node scripts/karpathy-wiki.mjs repair-links`.
+- **Search / 增强检索**: run `node scripts/karpathy-wiki.mjs search "query"` for agent-side cross-layer search.
+- **Distill / 查询沉淀**: run `node scripts/karpathy-wiki.mjs distill-query ...` when a query creates durable reusable knowledge.
 - **Visualize / 可视化 / dashboard**: run `node scripts/karpathy-wiki.mjs dashboard` and return the dashboard URL.
 
 ## Commands
@@ -31,6 +35,9 @@ Always run commands from this skill directory, or use absolute paths to its `scr
 ```bash
 node scripts/karpathy-wiki.mjs status
 node scripts/karpathy-wiki.mjs lint
+node scripts/karpathy-wiki.mjs garden
+node scripts/karpathy-wiki.mjs repair-links
+node scripts/karpathy-wiki.mjs search "HTML artifact"
 node scripts/karpathy-wiki.mjs dashboard
 node scripts/karpathy-wiki.mjs build-dashboard
 ```
@@ -45,6 +52,13 @@ node scripts/karpathy-wiki.mjs capture \
 ```
 
 Pipe article content on stdin or pass `--content-file /path/to/file`.
+
+By default `capture` also:
+
+- fetches a snapshot into `raw/snapshots/`
+- stores `snapshot_path`, `content_hash`, `capture_method`, and `source_quality`
+- mirrors remote Markdown images when possible
+- refreshes the dashboard automatically
 
 For local or remote images:
 
@@ -65,6 +79,8 @@ node scripts/karpathy-wiki.mjs capture \
 6. Append a short dated entry to `wiki/log.md`.
 7. Refresh the dashboard graph after every ingest or wiki edit. This is mandatory and implicit; do not ask the user to request it.
 8. Images are first-class source material. Preserve remote image Markdown links in their original inline positions so raw notes read like the source article. Copy local images into `raw/assets/<source-slug>/` and reference them from the raw note. If vision is available, transcribe visible text and mark interpretation as inferred.
+9. Prefer Obsidian-native capabilities first: Properties, Templates, Dataview, Bases, backlinks, Graph View, and Canvas stay inside Obsidian. Dashboard/search only add agent automation, health review, and richer reading/visualization.
+10. Do not mark a raw note `processed` unless it has a resolved primary wiki target, that wiki page links back to the raw note, obvious follow-up flags are cleared, and key related links are closed. Otherwise use `inbox` or `needs-followup`.
 
 ## Query Rules
 
@@ -72,7 +88,7 @@ node scripts/karpathy-wiki.mjs capture \
 2. Use frontmatter and headings to choose candidate pages.
 3. Read at most the top few wiki pages unless the user asks for exhaustive research.
 4. Cite local pages with file paths when useful.
-5. If the query exposes a durable missing concept and the user allowed updates, add or update a wiki page and refresh the graph.
+5. If the query exposes a durable missing concept and the user allowed updates, add or update a wiki page, use `distill-query` when appropriate, and refresh the graph.
 
 ## Visualization Rules
 
@@ -85,6 +101,16 @@ node scripts/karpathy-wiki.mjs dashboard
 This regenerates `tools/wiki-dashboard/public/wiki-graph.json`, starts Vite if needed, and reports `http://127.0.0.1:5173/`.
 
 The dashboard detail panel renders a safe HTML reading view from Markdown, preserving text structure and inline image order. It is a reading/inspection surface, not the source of truth.
+
+Use the dashboard for:
+
+- raw/wiki cross-layer search views
+- inbox and stale review
+- unresolved-link triage
+- typed relation inspection
+- source-count and health summaries
+
+Use Obsidian itself for everyday editing, backlinks, page navigation, graph browsing, Dataview, Bases, and templates.
 
 ## Platform Notes
 

@@ -15,7 +15,11 @@ const commands = {
   refresh: ["refresh-dashboard.mjs", ...rest],
   dashboard: ["refresh-dashboard.mjs", "--serve", ...rest],
   build: ["refresh-dashboard.mjs", "--build", ...rest],
-  "build-dashboard": ["refresh-dashboard.mjs", "--serve", "--build", ...rest]
+  "build-dashboard": ["refresh-dashboard.mjs", "--serve", "--build", ...rest],
+  garden: ["garden.mjs", ...rest],
+  "repair-links": ["repair-links.mjs", ...rest],
+  "distill-query": ["distill-query.mjs", ...rest],
+  search: ["search.mjs", ...rest]
 };
 
 function printHelp() {
@@ -29,6 +33,10 @@ Usage:
   node scripts/karpathy-wiki.mjs refresh [--serve] [--build]
   node scripts/karpathy-wiki.mjs build-dashboard
   node scripts/karpathy-wiki.mjs capture --title "Title" --url "https://..." --type webpage
+  node scripts/karpathy-wiki.mjs search "query terms"
+  node scripts/karpathy-wiki.mjs garden
+  node scripts/karpathy-wiki.mjs repair-links
+  node scripts/karpathy-wiki.mjs distill-query --title "Durable answer" --summary-file /tmp/answer.md --source raw/...
 
 Environment:
   KARPATHY_OBSIDIAN_VAULT=/path/to/vault
